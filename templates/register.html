@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Register - BookNook{% endblock %}
+{% block content %}
+<div class="auth-form">
+    <div class="text-center mb-4">
+        <i class="fas fa-user-plus" style="font-size: 3rem; color: var(--accent);"></i>
+        <h2 style="color: var(--text-main); margin-top: 1rem; font-weight: 600;">Create Account</h2>
+        <p class="text-muted">Join BookNook and start your reading journey</p>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <div class="mb-4">
+            <label class="form-label" for="username">USERNAME</label>
+            <div class="input-field-container">
+                <div class="input-icon-container">
+                    <i class="fas fa-user text-secondary"></i>
+                </div>
+                <input type="text" class="form-control custom-input" name="username" placeholder="Choose a username" required>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label" for="password">PASSWORD</label>
+            <div class="input-field-container">
+                <div class="input-icon-container">
+                    <i class="fas fa-lock text-secondary"></i>
+                </div>
+                <input type="password" class="form-control custom-input" name="password" placeholder="Create a password" required>
+            </div>
+            <small class="text-muted">Password should be at least 8 characters long</small>
+        </div>
+
+        <button type="submit" class="btn-main" style="margin-top:1.5rem;">
+            <i class="fas fa-user-plus me-2"></i>Register
+        </button>
+
+        <div class="text-center mt-4">
+            <p class="text-muted">Already have an account? <a href="{{ url_for('login') }}" style="color: var(--accent); text-decoration: none; font-weight: 500;">Login</a></p>
+        </div>
+    </form>
+</div>
+{% endblock %}

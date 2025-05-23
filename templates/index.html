@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}BookNook - Your Online Bookstore{% endblock %}
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="page-title">Welcome to BookNook</h1>
+    <p class="lead text-muted mb-4">Discover your next favorite book from our carefully curated collection</p>
+</div>
+
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: var(--text-main); font-size: 1.5rem; font-weight: 600;">Featured Books</h2>
+        <a href="#" class="text-decoration-none" style="color: var(--accent); font-weight: 500;">
+            View All <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+    <div class="grid">
+        {% for book in books[:4] %}
+        <div class="card">
+            <div class="position-absolute" style="top: 10px; right: 10px; z-index: 10;">
+                <span class="badge bg-accent" style="background-color: var(--accent);">New</span>
+            </div>
+            <img class="lazy card-img-top" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=book[4]) }}" alt="{{ book[1] }}">
+            <div class="card-title">{{ book[1] }}</div>
+            <div class="card-author">by {{ book[2] }}</div>
+            <div class="card-price">${{ '%.2f'|format(book[3]) }}</div>
+            <a href="{{ url_for('add_to_cart', book_id=book[0]) }}" class="btn-main">
+                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="color: var(--text-main); font-size: 1.5rem; font-weight: 600;">All Books</h2>
+    </div>
+    <div class="grid">
+        {% for book in books %}
+        <div class="card">
+            <img class="lazy card-img-top" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=book[4]) }}" alt="{{ book[1] }}">
+            <div class="card-title">{{ book[1] }}</div>
+            <div class="card-author">by {{ book[2] }}</div>
+            <div class="card-price">${{ '%.2f'|format(book[3]) }}</div>
+            <a href="{{ url_for('add_to_cart', book_id=book[0]) }}" class="btn-main">
+                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

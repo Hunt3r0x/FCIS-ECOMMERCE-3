@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Order Details - Admin - BookNook{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title mb-0">Order Details</h1>
+    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Admin Panel
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title">Order Information</h5>
+                <p><strong>Order ID:</strong> #{{ order[0] }}</p>
+                <p><strong>Date:</strong> {{ order[1].strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Customer:</strong> {{ order[4] or 'Unknown' }} {% if order[5] %}(ID: {{ order[5] }}){% endif %}</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="card-title">Order Status</h5>
+                <form method="POST" action="{{ url_for('admin_panel') }}">
+                    <input type="hidden" name="order_id" value="{{ order[0] }}">
+                    <input type="hidden" name="action" value="update_order_status">
+                    <div class="input-group mb-3">
+                        <select class="form-select" name="status">
+                            <option value="pending" {% if order[3] == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="processing" {% if order[3] == 'processing' %}selected{% endif %}>Processing</option>
+                            <option value="shipped" {% if order[3] == 'shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if order[3] == 'delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="cancelled" {% if order[3] == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        <button class="btn btn-primary" type="submit">Update</button>
+                    </div>
+                </form>
+                <h5 class="card-title mt-4">Order Total</h5>
+                <h3 class="text-primary">${{ '%.2f'|format(order[2]) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Order Items</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td>
+                            <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=item[5]) }}" style="width:40px; height:60px; object-fit:cover;">
+                        </td>
+                        <td>{{ item[6] }}</td>
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[2] }}</td>
+                        <td>{{ item[3] }}</td>
+                        <td>${{ '%.2f'|format(item[4]) }}</td>
+                        <td>${{ '%.2f'|format(item[3] * item[4]) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>${{ '%.2f'|format(order[2]) }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

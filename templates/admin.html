@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - BookNook{% endblock %}
+{% block content %}
+<h1 class="page-title">Admin Dashboard</h1>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="card" style="border-left: 4px solid var(--accent);">
+            <div class="card-body p-3">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center" style="font-size: 2rem; color: var(--accent);">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="col-9">
+                        <div style="color: var(--text-soft); font-size: 0.9rem; text-transform: uppercase; font-weight: 500;">Total Books</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main);">{{ books|length }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card" style="border-left: 4px solid #28a745;">
+            <div class="card-body p-3">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center" style="font-size: 2rem; color: #28a745;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="col-9">
+                        <div style="color: var(--text-soft); font-size: 0.9rem; text-transform: uppercase; font-weight: 500;">Total Users</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main);">{{ users|length }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card" style="border-left: 4px solid #ffc107;">
+            <div class="card-body p-3">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center" style="font-size: 2rem; color: #ffc107;">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="col-9">
+                        <div style="color: var(--text-soft); font-size: 0.9rem; text-transform: uppercase; font-weight: 500;">Orders</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main);">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card" style="border-left: 4px solid #dc3545;">
+            <div class="card-body p-3">
+                <div class="row align-items-center">
+                    <div class="col-3 text-center" style="font-size: 2rem; color: #dc3545;">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="col-9">
+                        <div style="color: var(--text-soft); font-size: 0.9rem; text-transform: uppercase; font-weight: 500;">Revenue</div>
+                        <div style="font-size: 1.5rem; font-weight: 600; color: var(--text-main);">$0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mb-5">
+    <div class="border-top border-primary border-3 mb-4"></div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-book text-primary me-2"></i>
+            <h5 class="mb-0 fw-bold">Manage Books</h5>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">
+            <i class="fas fa-plus me-1"></i> Add New Book
+        </button>
+    </div>
+
+    <div class="bg-light rounded shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr class="bg-light">
+                    <th class="ps-4">TITLE</th>
+                    <th>AUTHOR</th>
+                    <th>PRICE</th>
+                    <th>IMAGE</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td class="ps-4">{{ book[1] }}</td>
+                    <td>{{ book[2] }}</td>
+                    <td>${{ '%.2f'|format(book[3]) }}</td>
+                    <td>
+                        <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=book[4]) }}" style="width:50px; height:70px; object-fit:cover;">
+                    </td>
+                    <td>
+                        <form method="POST" class="d-flex">
+                            <input type="hidden" name="book_id" value="{{ book[0] }}">
+                            <button type="button" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal{{ book[0] }}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button type="submit" name="action" value="delete_book" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for adding new book -->
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="add_book">
+
+                    <div class="mb-3">
+                        <label class="form-label">TITLE</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">AUTHOR</label>
+                        <input type="text" class="form-control" name="author" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">PRICE</label>
+                        <input type="number" class="form-control" name="price" step="0.01" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">IMAGE URL</label>
+                        <div class="dropdown">
+                            <input type="text" class="form-control" name="cover_url" id="addBookImageUrl" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Click to select an image">
+                            <ul class="dropdown-menu w-100" aria-labelledby="addBookImageUrl" style="max-height: 300px; overflow-y: auto;">
+                                {% for image in images %}
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="#" onclick="selectImage('{{ image }}', 'addBookImageUrl')">
+                                        <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=image) }}" style="width: 30px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                        <span>{{ image }}</span>
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <img id="addBookImageUrlPreview" src="#" style="max-height: 100px; max-width: 100%; display: none; margin: 0 auto;">
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Book</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals for editing books -->
+{% for book in books %}
+<div class="modal fade" id="editBookModal{{ book[0] }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <input type="hidden" name="book_id" value="{{ book[0] }}">
+                    <input type="hidden" name="action" value="edit_book">
+
+                    <div class="mb-3">
+                        <label class="form-label">TITLE</label>
+                        <input type="text" class="form-control" name="title" value="{{ book[1] }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">AUTHOR</label>
+                        <input type="text" class="form-control" name="author" value="{{ book[2] }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">PRICE</label>
+                        <input type="number" class="form-control" name="price" step="0.01" value="{{ book[3] }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">IMAGE URL</label>
+                        <div class="dropdown">
+                            <input type="text" class="form-control" name="cover_url" id="editBookImageUrl{{ book[0] }}" value="{{ book[4] }}" data-bs-toggle="dropdown" aria-expanded="false" placeholder="Click to select an image">
+                            <ul class="dropdown-menu w-100" aria-labelledby="editBookImageUrl{{ book[0] }}" style="max-height: 300px; overflow-y: auto;">
+                                {% for image in images %}
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="#" onclick="selectImage('{{ image }}', 'editBookImageUrl{{ book[0] }}')">
+                                        <img class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=image) }}" style="width: 30px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                        <span>{{ image }}</span>
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <img id="editBookImageUrl{{ book[0] }}Preview" class="lazy" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-src="{{ url_for('static', filename=book[4]) }}" style="max-height: 100px; max-width: 100%; display: block; margin: 0 auto;">
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="container-fluid mb-5">
+    <div class="border-top border-primary border-3 mb-4"></div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-users text-primary me-2"></i>
+            <h5 class="mb-0 fw-bold">Manage Users</h5>
+        </div>
+    </div>
+
+    <div class="bg-light rounded shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr class="bg-light">
+                    <th class="ps-4">ID</th>
+                    <th>USERNAME</th>
+                    <th>ADMIN</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <form method="POST">
+                        <td class="ps-4">{{ user.id }}</td>
+                        <td><input type="text" class="form-control" name="username" value="{{ user.username }}"></td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button type="submit" name="action" value="edit_user" class="btn btn-sm btn-primary me-2">
+                                <i class="fas fa-save me-1"></i>Save
+                            </button>
+                            <button type="submit" name="action" value="delete_user" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash-alt me-1"></i>Delete
+                            </button>
+                        </td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container-fluid mb-5">
+    <div class="border-top border-primary border-3 mb-4"></div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-shopping-bag text-primary me-2"></i>
+            <h5 class="mb-0 fw-bold">Manage Orders</h5>
+        </div>
+    </div>
+
+    <div class="bg-light rounded shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr class="bg-light">
+                    <th class="ps-4">ORDER ID</th>
+                    <th>DATE</th>
+                    <th>CUSTOMER</th>
+                    <th>TOTAL</th>
+                    <th>STATUS</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if orders %}
+                {% for order in orders %}
+                <tr>
+                    <td class="ps-4">#{{ order[0] }}</td>
+                    <td>{{ order[1].strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ order[4] or 'Unknown' }}</td>
+                    <td>${{ '%.2f'|format(order[2]) }}</td>
+                    <td>
+                        {% if order[3] == 'pending' %}
+                        <span class="badge bg-warning text-dark">{{ order[3] }}</span>
+                        {% elif order[3] == 'processing' %}
+                        <span class="badge bg-info text-dark">{{ order[3] }}</span>
+                        {% elif order[3] == 'shipped' %}
+                        <span class="badge bg-primary">{{ order[3] }}</span>
+                        {% elif order[3] == 'delivered' %}
+                        <span class="badge bg-success">{{ order[3] }}</span>
+                        {% elif order[3] == 'cancelled' %}
+                        <span class="badge bg-danger">{{ order[3] }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{{ order[3] }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin_order_details', order_id=order[0]) }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye me-1"></i>View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">No orders found</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function selectImage(imageUrl, inputId) {
+        document.getElementById(inputId).value = imageUrl;
+
+        // Show a preview of the selected image
+        const previewId = inputId + 'Preview';
+        const previewElement = document.getElementById(previewId);
+        if (previewElement) {
+            previewElement.src = "{{ url_for('static', filename='') }}" + imageUrl;
+            previewElement.dataset.src = "{{ url_for('static', filename='') }}" + imageUrl;
+            previewElement.style.display = 'block';
+        }
+    }
+</script>
+{% endblock %}
